@@ -108,7 +108,7 @@ L<String::Util>
 
 Util::Utl also provides some additional functionality
 
-Each function here is used/accessed in the same way:
+Each function here is accessed in the same way:
 
     utl->$name( ... )
 
@@ -129,24 +129,30 @@ L<List::Util>::first
     %hash = ( a => 1, b => 2, c => 3 )
     ... = utl->first( \%hash, qw/ z a b / ) # Returns 1
 
-For each name in C<@query), test C<$hash> to see if it exists. Returns the value of
+For each name in C<@query>, test C<$hash> to see if it exists. Returns the value of
 the first entry found
 
 Returns undef if none exist
 
 $options (a HASH reference) are:
 
-    exclusive       Set to true to throw an exception if more than 1 of query is present
+    exclusive       True to throw an exception if more than 1 of query is present
                     in $hash
 
                         %hash = ( a => 1, b => 2, c => 3 );
-                        ... = utl->first( \%hash, qw/ a b /, { exclusive => 1 } ) # Throws an exception (die)
-                        ... = utl->first( \%hash, qw/ a z /, { exclusive => 1 } ) # Does not throw an exception
+
+                        ... = utl->first( \%hash, qw/ a b /, { exclusive => 1 } )
+                        # Throws an exception (die)
+
+                        ... = utl->first( \%hash, qw/ a z /, { exclusive => 1 } )
+                        # Does not throw an exception 
 
     test            A subroutine for testing whether a value should be included or not. Can be
                     used to skip over undefined or empty values
 
                         %hash = ( a => undef, b => '', c => 1 );
-                        ... = utl->first( \%hash, qw/ a b c /, { test => sub { defined } } ) # Returns ''
+
+                        ... = utl->first( \%hash, qw/ a b c /, { test => sub { defined } } )
+                        # Returns ''
 
 =cut
