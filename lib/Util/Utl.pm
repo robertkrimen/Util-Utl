@@ -9,6 +9,11 @@ use Scalar::Util;
 use Package::Pkg;
 use Carp qw/ croak confess /;
 
+sub import {
+    my $package = caller;
+    pkg->install( code => sub { __PACKAGE__ }, into => $package, as => 'utl' );
+}
+
 sub first {
     my $self = shift;
     goto &List::Util::first if ref $_[0] eq 'CODE';
@@ -46,6 +51,24 @@ sub _first_hash {
     }
 
     return $hash->{ $found[0] };
+}
+
+{
+    my $install = sub {
+        my $package = shift;
+        my @export = @_;
+        @export = eval "\@${package}::EXPORT_OK" if not @export;
+        for my $method ( @export ) {
+            next if __PACKAGE__->can( $method );
+            no strict 'refs';
+            *$method = eval qq/sub { shift; goto &${package}::$method };/;
+        }
+    };
+
+    $install->( 'List::Util' );
+    $install->( 'List::MoreUtils' );
+    $install->( 'Scalar::Util' );
+    $install->( 'String::Util' );
 }
 
 1;

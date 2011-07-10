@@ -6,7 +6,6 @@ use warnings;
 use Test::Most;
 
 use Util::Utl;
-sub utl { 'Util::Utl' }
 
 is( utl->first( sub { defined }, ( undef, undef, qw/ 1 2 3 /, undef ) ), 1 );
 
@@ -20,6 +19,5 @@ is( utl->first( \%hash, qw/ c e /, { exclusive => 1 } ), 3 );
 throws_ok { utl->first( \%hash, qw/ b e a /, { exclusive => 1 } ) } qr/\Qfirst: Found non-exclusive keys (b a) in hash\E/;
 
 done_testing;
-
 
 1;
