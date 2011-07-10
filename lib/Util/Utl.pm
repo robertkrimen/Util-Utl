@@ -1,11 +1,9 @@
 package Util::Utl;
+# ABSTRACT: Scalar::Util, List::Util, List::MoreUtils, String::Util & more (via one subroutine)
 
 use strict;
 use warnings;
 
-use List::Util;
-use List::MoreUtils;
-use Scalar::Util;
 use Package::Pkg;
 use Carp qw/ croak confess /;
 
@@ -13,6 +11,9 @@ sub import {
     my $package = caller;
     pkg->install( code => sub { __PACKAGE__ }, into => $package, as => 'utl' );
 }
+
+sub empty { return not ( defined $_[1] and length $_[1] ) }
+sub blank { return not ( defined $_[1] and $_[1] =~ m/\S/ ) }
 
 sub first {
     my $self = shift;
@@ -33,10 +34,13 @@ sub _first_hash {
     my $exclusive = $options->{ exclusive };
 
     my @found;
-    for ( @query ) {
-        if ( exists $hash->{ $_ } ) {
-            next if $test and ! $test->( $hash->{ $_ }, $_, $hash );
-            push @found, $_;
+    for my $key ( @query ) {
+        if ( exists $hash->{ $key } ) {
+            if ( $test ) {
+                local $_ = $hash->{ $key };
+                next if not $test->( $_, $key, $hash );
+            }
+            push @found, $key;
             last if not $exclusive;
         }
     }
@@ -56,6 +60,7 @@ sub _first_hash {
 {
     my $install = sub {
         my $package = shift;
+        eval "require $package;" or die $@;
         my @export = @_;
         @export = eval "\@${package}::EXPORT_OK" if not @export;
         for my $method ( @export ) {
@@ -72,3 +77,76 @@ sub _first_hash {
 }
 
 1;
+
+__END__
+
+=head1 SYNOPSIS
+
+    use Util::Utl;
+
+    utl->first( { ... }, ... )
+
+    if ( utl->blessed( ... ) ) {
+    }
+
+    if ( utl->looks_like_number( ... ) ) {
+    }
+
+=head1 DESCRIPTION
+
+Util::Utl exports a single subroutine C<utl> which provides access to:
+
+L<Scalar::Util>
+
+L<List::Util>
+
+L<List::MoreUtils>
+
+L<String::Util>
+
+=head1 USAGE
+
+Util::Utl also provides some additional functionality
+
+Each function here is used/accessed in the same way:
+
+    utl->$name( ... )
+
+=head2 empty( $value )
+
+Returns true if $value is undefined or has 0-length
+
+=head2 blank( $value )
+
+Returns true if $value is undefined or is composed only of whitespace (\s)
+
+=head2 first( $code, ... )
+
+L<List::Util>::first
+
+=head2 first( $hash, @query, $options )
+
+    %hash = ( a => 1, b => 2, c => 3 )
+    ... = utl->first( \%hash, qw/ z a b / ) # Returns 1
+
+For each name in C<@query), test C<$hash> to see if it exists. Returns the value of
+the first entry found
+
+Returns undef if none exist
+
+$options (a HASH reference) are:
+
+    exclusive       Set to true to throw an exception if more than 1 of query is present
+                    in $hash
+
+                        %hash = ( a => 1, b => 2, c => 3 );
+                        ... = utl->first( \%hash, qw/ a b /, { exclusive => 1 } ) # Throws an exception (die)
+                        ... = utl->first( \%hash, qw/ a z /, { exclusive => 1 } ) # Does not throw an exception
+
+    test            A subroutine for testing whether a value should be included or not. Can be
+                    used to skip over undefined or empty values
+
+                        %hash = ( a => undef, b => '', c => 1 );
+                        ... = utl->first( \%hash, qw/ a b c /, { test => sub { defined } } ) # Returns ''
+
+=cut
