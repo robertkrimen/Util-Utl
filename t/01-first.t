@@ -6,7 +6,7 @@ use Util::Utl;
 
 is( utl->first( sub { defined }, ( undef, undef, qw/ 1 2 3 /, undef ) ), 1 );
 
-my ( %hash );
+my ( %hash, @result );
 
 %hash = qw/ a 1 b 2 c 3 d 4 /;
 is( utl->first( \%hash, qw/ a b c d / ), 1 );
@@ -20,6 +20,8 @@ is( utl->first( \%hash, qw/ a b c /, { test => sub { defined } } ), '' );
 is( utl->first( \%hash, qw/ a b c /, { test => sub { ! utl->empty( $_ ) } } ), 1 ); 
 
 warning_is { is( utl->first( \%hash, qw/ x y z / ), undef ) } '';
+is( @result = utl->first( \%hash, qw/ x y z / ), 1 );
+is( @result = utl->first( \%hash, qw/ x y z /, { empty => 1 } ), 0 );
 
 done_testing;
 

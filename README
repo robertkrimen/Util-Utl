@@ -3,7 +3,7 @@ NAME
     more (via one subroutine)
 
 VERSION
-    version 0.0010
+    version 0.0011
 
 SYNOPSIS
         use Util::Utl;
@@ -58,7 +58,7 @@ USAGE
         exclusive       True to throw an exception if more than 1 of query is present
                         in $hash
 
-                            %hash = ( a => 1, b => 2, c => 3 );
+                            %hash = ( a => 1, b => 2, c => 3 )
 
                             ... = utl->first( \%hash, qw/ a b /, { exclusive => 1 } )
                             # Throws an exception (die)
@@ -69,10 +69,20 @@ USAGE
         test            A subroutine for testing whether a value should be included or not. Can be
                         used to skip over undefined or empty values
 
-                            %hash = ( a => undef, b => '', c => 1 );
+                            %hash = ( a => undef, b => '', c => 1 )
 
                             ... = utl->first( \%hash, qw/ a b c /, { test => sub { defined } } )
                             # Returns ''
+
+        empty           True to return an empty list instead of undef if none are found
+
+                            %hash = ( a => 1 )
+                        
+                            ... = utl->first( \%hash, qw/ z x y / )
+                            # Returns undef
+
+                            ... = utl->first( \%hash, qw/ z x y /, { empty => 1 } )
+                            # Returns ()
 
 AUTHOR
     Robert Krimen <robertkrimen@gmail.com>

@@ -54,7 +54,9 @@ sub _first_hash {
         }
     }
 
-    return undef unless @found;
+    return if $options->{ empty } && !@found;
+
+    return undef if !@found;
 
     return $hash->{ $found[0] };
 }
@@ -156,5 +158,15 @@ $options (a HASH reference) are:
 
                         ... = utl->first( \%hash, qw/ a b c /, { test => sub { defined } } )
                         # Returns ''
+
+    empty           True to return an empty list instead of undef if none are found
+
+                        %hash = ( a => 1 )
+                        
+                        ... = utl->first( \%hash, qw/ z x y / )
+                        # Returns undef
+
+                        ... = utl->first( \%hash, qw/ z x y /, { empty => 1 } )
+                        # Returns ()
 
 =cut
