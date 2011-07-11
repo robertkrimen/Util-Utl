@@ -19,6 +19,8 @@ throws_ok { utl->first( \%hash, qw/ b e a /, { exclusive => 1 } ) } qr/\Qfirst: 
 is( utl->first( \%hash, qw/ a b c /, { test => sub { defined } } ), '' ); 
 is( utl->first( \%hash, qw/ a b c /, { test => sub { ! utl->empty( $_ ) } } ), 1 ); 
 
+warning_is { is( utl->first( \%hash, qw/ x y z / ), undef ) } '';
+
 done_testing;
 
 1;

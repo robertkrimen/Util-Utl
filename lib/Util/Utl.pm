@@ -54,6 +54,8 @@ sub _first_hash {
         }
     }
 
+    return undef unless @found;
+
     return $hash->{ $found[0] };
 }
 
@@ -139,7 +141,7 @@ $options (a HASH reference) are:
     exclusive       True to throw an exception if more than 1 of query is present
                     in $hash
 
-                        %hash = ( a => 1, b => 2, c => 3 );
+                        %hash = ( a => 1, b => 2, c => 3 )
 
                         ... = utl->first( \%hash, qw/ a b /, { exclusive => 1 } )
                         # Throws an exception (die)
@@ -150,7 +152,7 @@ $options (a HASH reference) are:
     test            A subroutine for testing whether a value should be included or not. Can be
                     used to skip over undefined or empty values
 
-                        %hash = ( a => undef, b => '', c => 1 );
+                        %hash = ( a => undef, b => '', c => 1 )
 
                         ... = utl->first( \%hash, qw/ a b c /, { test => sub { defined } } )
                         # Returns ''
